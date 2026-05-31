@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>饭搭子匹配度测试 | 寻找口味灵魂伴侣</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(145deg, #FFF5E6 0%, #FDEBD8 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 1rem;
+            color: #3A2C1F;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #D97A2B, #B85C1A);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .hero p {
+            color: #7F5A3A;
+            font-weight: 500;
+        }
+        .match-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .user-card {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            border: 1px solid #FFE4C4;
+        }
+        .user-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px dashed #F0C9A0;
+        }
+        .question-group {
+            margin-bottom: 1.2rem;
+        }
+        .question-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #B45F2B;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .opt-btn {
+            background: #FEF5EA;
+            border: 1px solid #F2D8BD;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .opt-btn.active {
+            background: #D97A2B;
+            color: white;
+            border-color: #D97A2B;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .checkbox-item {
+            background: #FEF5EA;
+            border: 1px solid #F2D8BD;
+            border-radius: 60px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .checkbox-item.selected {
+            background: #D97A2B;
+            color: white;
+            border-color: #D97A2B;
+        }
+        .multi-limit-tip {
+            font-size: 0.7rem;
+            color: #C08142;
+            margin-top: 4px;
+        }
+        .sub-group {
+            margin-top: 0.8rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #F5D5B0;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, auto));
+            gap: 6px;
+        }
+        button {
+            background: #D97A2B;
+            border: none;
+            border-radius: 60px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 700;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        button:active { transform: scale(0.97); }
+        .calculate-btn {
+            width: 100%;
+            margin-top: 1rem;
+            background: #B45F2B;
+        }
+        .result-area {
+            background: #FFF8F0;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-top: 1rem;
+            border: 1px solid #F8E0C0;
+        }
+        .match-score {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #D97A2B, #B85C1A);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .match-level {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+        .detail-note {
+            font-size: 0.75rem;
+            color: #B87A4A;
+            margin-top: 1rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #C69A6D;
+        }
+        @media (max-width: 760px) {
+            .match-panel { flex-direction: column; }
+            .user-card { width: 100%; }
+        }
+        hr {
+            margin: 0.5rem 0;
+            border-color: #F5D5B0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>🍜 饭搭子匹配度测试</h1>
+        <p>填写你与搭子的饮食偏好 · 计算口味契合度 · 寻找灵魂饭友</p>
+    </div>
+
+    <div class="match-panel">
+        <!-- 用户A (我) -->
+        <div class="user-card" id="userACard">
+            <div class="user-title">👤 我的口味档案</div>
+            <div id="userAForm"></div>
+        </div>
+        <!-- 用户B (搭子) -->
+        <div class="user-card" id="userBCard">
+            <div class="user-title">👥 搭子的口味档案</div>
+            <div id="userBForm"></div>
+        </div>
+    </div>
+
+    <button id="matchBtn" class="calculate-btn">✨ 计算匹配度 ✨</button>
+    <div id="resultArea" class="result-area">
+        <div style="color: #B87A4A;">⬆️ 填写以上两人信息，点击计算匹配度 ⬆️</div>
+    </div>
+    <footer>⭐ 基于20+饮食维度 · 多选偏好使用Jaccard相似度 · 精准匹配饭搭子</footer>
+</div>
+
+<script>
+    // ---------- 问题配置 ----------
+    // 1. 单选基础题
+    const singleQuestions = [
+        { id: "dietConcept", label: "🍚 饮食观念", options: ["吃饭不可以将就", "随便吃吃", "喜欢尝新", "只吃熟悉的事物"] },
+        { id: "scenePref", label: "🏞️ 用餐场景偏好", options: ["路边摊", "户外野餐", "正常餐厅", "高档餐厅"] },
+        { id: "drinkAttitude", label: "🥤 饮品态度", options: ["必须搭配饮品", "可有可无", "只喝纯净水"] },
+        { id: "drinkPref", label: "🧋 饮品喜好", options: ["酒", "奶茶", "咖啡"] },
+        { id: "eatingSpeed", label: "⏱️ 吃饭速度", options: ["半小时内解决", "一小时到一个半小时", "两小时以上"] }
+    ];
+
+    // 2. 口味偏好（限选2个）
+    const tasteOptions = ["酸", "甜", "苦", "辣", "咸"];
+    // 3. 菜系偏好（多选，不限）
+    const cuisineOptions = ["苏帮菜", "川菜", "粤菜", "火锅", "烤肉", "西餐", "日料", "韩餐", "泰餐", "云南菜", "江西菜", "海鲜", "新疆菜", "东北菜", "贵州菜", "鲁菜", "福建菜", "湘菜", "西藏菜", "内蒙菜", "陕菜", "素食"];
+    // 4. 小料偏好（多选）
+    const toppingOptions = ["葱", "姜", "蒜", "芝麻", "花生碎", "香菜", "小米辣", "折耳根", "迷迭香", "薄荷", "罗勒叶", "百里香", "香茅草", "木姜子"];
+    // 5. 争议食物（多选）
+    const controversyOptions = ["臭豆腐", "榴莲", "菠萝蜜", "肥肠", "猪脑", "内脏", "皮蛋", "螺蛳粉", "苦瓜", "豆汁儿", "臭鳜鱼", "兔肉/狗肉/猫肉", "海鲜", "血", "刺身", "肥肉", "虫/土笋冻", "秋葵"];
+
+    // 6. 二选一系列 (11个)
+    const binaryQuestions = [
+        { id: "riceNoodle", label: "🍚 米饭 vs 面", optA: "米饭", optB: "面" },
+        { id: "fish", label: "🐟 水煮鱼 vs 酸菜鱼", optA: "水煮鱼", optB: "酸菜鱼" },
+        { id: "hotpotBbq", label: "🔥 火锅 vs 烤肉", optA: "火锅", optB: "烤肉" },
+        { id: "chineseWestern", label: "🥢 中餐 vs 西餐", optA: "中餐", optB: "西餐" },
+        { id: "coffeeMilkTea", label: "☕ 咖啡 vs 奶茶", optA: "咖啡", optB: "奶茶" },
+        { id: "egg", label: "🥚 溏心蛋 vs 全熟蛋", optA: "溏心蛋", optB: "全熟蛋" },
+        { id: "peach", label: "🍑 脆桃 vs 软桃", optA: "脆桃", optB: "软桃" },
+        { id: "chicken", label: "🍗 炸鸡腿 vs 烤鸡腿", optA: "炸鸡腿", optB: "烤鸡腿" },
+        { id: "zongzi", label: "🎋 甜粽子 vs 肉粽子", optA: "甜粽子", optB: "肉粽子" },
+        { id: "tofuBrain", label: "🥣 咸豆花 vs 甜豆花", optA: "咸豆花", optB: "甜豆花" },
+        { id: "corn", label: "🌽 糯玉米 vs 水果玉米", optA: "糯玉米", optB: "水果玉米" }
+    ];
+
+    // 数据结构：每个用户答案存储
+    function createEmptyAnswers() {
+        return {
+            single: {},          // id -> 选中索引
+            taste: [],          // 选中的口味数组 (最多2)
+            cuisine: [],        // 选中的菜系数组
+            topping: [],        // 小料数组
+            controversy: [],    // 争议食物数组
+            binary: {}          // id -> 选中值 'A' 或 'B'
+        };
+    }
+
+    let userA = createEmptyAnswers();
+    let userB = createEmptyAnswers();
+
+    // 渲染函数，动态生成两个用户表单
+    function renderUserForm(containerId, userData, userKey) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let html = '';
+
+        // 1. 单选题组
+        singleQuestions.forEach(q => {
+            const selected = userData.single[q.id] !== undefined ? userData.single[q.id] : -1;
+            let optsHtml = '';
+            q.options.forEach((opt, idx) => {
+                const activeClass = (selected === idx) ? 'active' : '';
+                optsHtml += `<div class="opt-btn ${activeClass}" data-qid="${q.id}" data-val="${idx}">${opt}</div>`;
+            });
+            html += `
+                <div class="question-group">
+                    <div class="question-label">${q.label}</div>
+                    <div class="options-row" data-group="single_${q.id}">
+                        ${optsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        // 2. 口味偏好（限选2个）
+        let tasteHtml = '';
+        tasteOptions.forEach(opt => {
+            const selected = userData.taste.includes(opt);
+            tasteHtml += `<div class="checkbox-item ${selected ? 'selected' : ''}" data-taste="${opt}">${opt}</div>`;
+        });
+        html += `
+            <div class="question-group">
+                <div class="question-label">👅 口味偏好 (最多选2项)</div>
+                <div class="checkbox-group" id="tasteGroup_${userKey}">
+                    ${tasteHtml}
+                </div>
+                <div class="multi-limit-tip">✔️ 可选择1-2项，超出自动取消最早选择</div>
+            </div>
+        `;
+
+        // 3. 菜系偏好（多选）
+        let cuisineHtml = '';
+        cuisineOptions.forEach(opt => {
+            const selected = userData.cuisine.includes(opt);
+            cuisineHtml += `<div class="checkbox-item ${selected ? 'selected' : ''}" data-cuisine="${opt}">${opt}</div>`;
+        });
+        html += `
+            <div class="question-group">
+                <div class="question-label">🍽️ 菜系偏好 (可多选)</div>
+                <div class="checkbox-group grid-2col" id="cuisineGroup_${userKey}">
+                    ${cuisineHtml}
+                </div>
+            </div>
+        `;
+
+        // 4. 小料偏好
+        let toppingHtml = '';
+        toppingOptions.forEach(opt => {
+            const selected = userData.topping.includes(opt);
+            toppingHtml += `<div class="checkbox-item ${selected ? 'selected' : ''}" data-topping="${opt}">${opt}</div>`;
+        });
+        html += `
+            <div class="question-group">
+                <div class="question-label">🧂 小料/香料偏好 (可多选)</div>
+                <div class="checkbox-group grid-2col" id="toppingGroup_${userKey}">
+                    ${toppingHtml}
+                </div>
+            </div>
+        `;
+
+        // 5. 争议食物
+        let controversyHtml = '';
+        controversyOptions.forEach(opt => {
+            const selected = userData.controversy.includes(opt);
+            controversyHtml += `<div class="checkbox-item ${selected ? 'selected' : ''}" data-contro="${opt}">${opt}</div>`;
+        });
+        html += `
+            <div class="question-group">
+                <div class="question-label">⚠️ 争议食物接受度 (可多选)</div>
+                <div class="checkbox-group grid-2col" id="controversyGroup_${userKey}">
+                    ${controversyHtml}
+                </div>
+            </div>
+        `;
+
+        // 6. 二选一系列
+        binaryQuestions.forEach(q => {
+            const selected = userData.binary[q.id];
+            let optsHtml = `
+                <div class="opt-btn ${selected === 'A' ? 'active' : ''}" data-binary="${q.id}" data-choice="A">${q.optA}</div>
+                <div class="opt-btn ${selected === 'B' ? 'active' : ''}" data-binary="${q.id}" data-choice="B">${q.optB}</div>
+            `;
+            html += `
+                <div class="question-group">
+                    <div class="question-label">🍽️ ${q.label}</div>
+                    <div class="options-row" data-binary-group="${q.id}">
+                        ${optsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+        // 绑定动态事件
+        bindUserEvents(userKey);
+    }
+
+    // 绑定每个用户区域的事件
+    function bindUserEvents(userKey) {
+        const container = userKey === 'A' ? document.getElementById('userAForm') : document.getElementById('userBForm');
+        if (!container) return;
+        const userData = userKey === 'A' ? userA : userB;
+        const updateCallback = () => {
+            // 重新渲染整个区域以保持状态同步（简单但可靠）
+            renderUserForm(`user${userKey}Form`, userData, userKey);
+        };
+        // 单选题事件 (委托)
+        container.querySelectorAll('[data-group^="single_"]').forEach(group => {
+            group.querySelectorAll('.opt-btn').forEach(btn => {
+                btn.removeEventListener('click', singleHandler);
+                btn.addEventListener('click', singleHandler);
+            });
+        });
+        function singleHandler(e) {
+            const btn = e.currentTarget;
+            const qid = btn.getAttribute('data-qid');
+            const val = parseInt(btn.getAttribute('data-val'));
+            userData.single[qid] = val;
+            updateCallback();
+        }
+
+        // 口味偏好 (限2)
+        const tasteGroup = container.querySelector(`#tasteGroup_${userKey}`);
+        if (tasteGroup) {
+            tasteGroup.querySelectorAll('.checkbox-item').forEach(item => {
+                item.removeEventListener('click', tasteHandler);
+                item.addEventListener('click', tasteHandler);
+            });
+        }
+        function tasteHandler(e) {
+            const val = e.currentTarget.getAttribute('data-taste');
+            const idx = userData.taste.indexOf(val);
+            if (idx !== -1) {
+                userData.taste.splice(idx, 1);
+            } else {
+                if (userData.taste.length >= 2) {
+                    userData.taste.shift(); // 移除最早
+                }
+                userData.taste.push(val);
+            }
+            updateCallback();
+        }
+
+        // 菜系
+        const cuisineGroup = container.querySelector(`#cuisineGroup_${userKey}`);
+        if (cuisineGroup) {
+            cuisineGroup.querySelectorAll('.checkbox-item').forEach(item => {
+                item.removeEventListener('click', cuisineHandler);
+                item.addEventListener('click', cuisineHandler);
+            });
+        }
+        function cuisineHandler(e) {
+            const val = e.currentTarget.getAttribute('data-cuisine');
+            const idx = userData.cuisine.indexOf(val);
+            if (idx !== -1) userData.cuisine.splice(idx, 1);
+            else userData.cuisine.push(val);
+            updateCallback();
+        }
+
+        // 小料
+        const toppingGroup = container.querySelector(`#toppingGroup_${userKey}`);
+        if (toppingGroup) {
+            toppingGroup.querySelectorAll('.checkbox-item').forEach(item => {
+                item.removeEventListener('click', toppingHandler);
+                item.addEventListener('click', toppingHandler);
+            });
+        }
+        function toppingHandler(e) {
+            const val = e.currentTarget.getAttribute('data-topping');
+            const idx = userData.topping.indexOf(val);
+            if (idx !== -1) userData.topping.splice(idx, 1);
+            else userData.topping.push(val);
+            updateCallback();
+        }
+
+        // 争议食物
+        const controGroup = container.querySelector(`#controversyGroup_${userKey}`);
+        if (controGroup) {
+            controGroup.querySelectorAll('.checkbox-item').forEach(item => {
+                item.removeEventListener('click', controHandler);
+                item.addEventListener('click', controHandler);
+            });
+        }
+        function controHandler(e) {
+            const val = e.currentTarget.getAttribute('data-contro');
+            const idx = userData.controversy.indexOf(val);
+            if (idx !== -1) userData.controversy.splice(idx, 1);
+            else userData.controversy.push(val);
+            updateCallback();
+        }
+
+        // 二选一
+        binaryQuestions.forEach(q => {
+            const group = container.querySelector(`.options-row[data-binary-group="${q.id}"]`);
+            if (group) {
+                group.querySelectorAll('.opt-btn').forEach(btn => {
+                    btn.removeEventListener('click', binaryHandler);
+                    btn.addEventListener('click', binaryHandler);
+                });
+            }
+        });
+        function binaryHandler(e) {
+            const btn = e.currentTarget;
+            const qid = btn.getAttribute('data-binary');
+            const choice = btn.getAttribute('data-choice');
+            userData.binary[qid] = choice;
+            updateCallback();
+        }
+    }
+
+    // ---------- 匹配度算法 ----------
+    function calcMatchScore(userA, userB) {
+        let totalWeight = 0;
+        let totalScore = 0;
+
+        // 1. 单选题：相同得1分，不同0分
+        for (let q of singleQuestions) {
+            totalWeight += 1;
+            const aVal = userA.single[q.id];
+            const bVal = userB.single[q.id];
+            if (aVal !== undefined && bVal !== undefined && aVal === bVal) totalScore += 1;
+        }
+
+        // 2. 口味偏好（限选2，集合相似度 Jaccard）
+        const tasteSetA = new Set(userA.taste);
+        const tasteSetB = new Set(userB.taste);
+        const tasteIntersect = new Set([...tasteSetA].filter(x => tasteSetB.has(x))).size;
+        const tasteUnion = new Set([...tasteSetA, ...tasteSetB]).size;
+        const tasteSim = tasteUnion === 0 ? 1 : tasteIntersect / tasteUnion;
+        totalWeight += 1;
+        totalScore += tasteSim;
+
+        // 3. 菜系偏好（Jaccard）
+        const cuisineSetA = new Set(userA.cuisine);
+        const cuisineSetB = new Set(userB.cuisine);
+        const cuisineInter = new Set([...cuisineSetA].filter(x => cuisineSetB.has(x))).size;
+        const cuisineUnion = new Set([...cuisineSetA, ...cuisineSetB]).size;
+        const cuisineSim = cuisineUnion === 0 ? 1 : cuisineInter / cuisineUnion;
+        totalWeight += 1;
+        totalScore += cuisineSim;
+
+        // 4. 小料偏好 Jaccard
+        const topSetA = new Set(userA.topping);
+        const topSetB = new Set(userB.topping);
+        const topInter = new Set([...topSetA].filter(x => topSetB.has(x))).size;
+        const topUnion = new Set([...topSetA, ...topSetB]).size;
+        const topSim = topUnion === 0 ? 1 : topInter / topUnion;
+        totalWeight += 1;
+        totalScore += topSim;
+
+        // 5. 争议食物 Jaccard
+        const controSetA = new Set(userA.controversy);
+        const controSetB = new Set(userB.controversy);
+        const controInter = new Set([...controSetA].filter(x => controSetB.has(x))).size;
+        const controUnion = new Set([...controSetA, ...controSetB]).size;
+        const controSim = controUnion === 0 ? 1 : controInter / controUnion;
+        totalWeight += 1;
+        totalScore += controSim;
+
+        // 6. 二选一系列：每个相同得1，不同0
+        for (let q of binaryQuestions) {
+            totalWeight += 1;
+            const aChoice = userA.binary[q.id];
+            const bChoice = userB.binary[q.id];
+            if (aChoice && bChoice && aChoice === bChoice) totalScore += 1;
+        }
+
+        const matchPercent = (totalScore / totalWeight) * 100;
+        return Math.min(100, Math.round(matchPercent));
+    }
+
+    function getMatchLevel(percent) {
+        if (percent < 30) return { text: "❌ 不匹配", color: "#C0392B", advice: "口味差异较大，建议先约个简单餐饮互相了解～" };
+        if (percent >= 30 && percent < 50) return { text: "⚠️ 有点匹配", color: "#E67E22", advice: "部分偏好相似，可以尝试中和口味的餐厅" };
+        if (percent >= 50 && percent < 80) return { text: "👍 一般匹配", color: "#F39C12", advice: "有不少共同喜好，大概率能愉快干饭！" };
+        return { text: "🎉 非常匹配", color: "#27AE60", advice: "灵魂饭搭子！一起探索美食天堂吧～" };
+    }
+
+    // 校验双方必填项 (简单提醒)
+    function checkComplete(userData, userLabel) {
+        // 检查是否所有单选都已选
+        for (let q of singleQuestions) {
+            if (userData.single[q.id] === undefined) {
+                alert(`${userLabel} 请完成「${q.label}」选择`);
+                return false;
+            }
+        }
+        // 二选一全部检查
+        for (let q of binaryQuestions) {
+            if (!userData.binary[q.id]) {
+                alert(`${userLabel} 请完成「${q.label}」二选一`);
+                return false;
+            }
+        }
+        // 口味可以不选，但至少比较能计算，但为了体验不强求全选多选，允许空
+        return true;
+    }
+
+    // 刷新结果UI
+    function computeAndShow() {
+        if (!checkComplete(userA, "我的口味档案")) return;
+        if (!checkComplete(userB, "搭子的口味档案")) return;
+        const score = calcMatchScore(userA, userB);
+        const level = getMatchLevel(score);
+        const resultDiv = document.getElementById("resultArea");
+        resultDiv.innerHTML = `
+            <div class="match-score">${score}%</div>
+            <div class="match-level" style="color:${level.color}">${level.text}</div>
+            <div style="margin: 1rem 0; padding: 0.6rem; background: #FFF0E0; border-radius: 2rem;">💡 ${level.advice}</div>
+            <div class="detail-note">⭐ 基于饮食观念、口味、菜系、小料、争议食物及11组二选一偏好综合计算</div>
+            <button id="resetMatchBtn" style="background:#C08142; margin-top:12px; padding:0.4rem 1rem; font-size:0.8rem;">🔄 重新匹配</button>
+        `;
+        const resetBtn = document.getElementById("resetMatchBtn");
+        if (resetBtn) {
+            resetBtn.addEventListener("click", () => {
+                // 不重置数据，只隐藏结果，可选，为了体验简单刷新结果区域为初始
+                resultDiv.innerHTML = `<div style="color: #B87A4A;">⬆️ 填写以上两人信息，点击计算匹配度 ⬆️</div>`;
+            });
+        }
+    }
+
+    // 重置所有数据
+    function fullReset() {
+        userA = createEmptyAnswers();
+        userB = createEmptyAnswers();
+        renderUserForm('userAForm', userA, 'A');
+        renderUserForm('userBForm', userB, 'B');
+        document.getElementById("resultArea").innerHTML = `<div style="color: #B87A4A;">已重置，重新填写两人偏好再计算～</div>`;
+    }
+
+    // 初始化
+    function init() {
+        renderUserForm('userAForm', userA, 'A');
+        renderUserForm('userBForm', userB, 'B');
+        const matchBtn = document.getElementById('matchBtn');
+        matchBtn.addEventListener('click', computeAndShow);
+        // 重置按钮可选全局重置（简单加一个顶部重置按钮？但已在结果区提供重置。再加全局重置容易混淆，暂时不加）
+    }
+
+    init();
+</script>
+</body>
+</html>
